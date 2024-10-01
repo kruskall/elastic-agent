@@ -120,10 +120,6 @@ linters-settings:
       - github.com/openshift/api
       - github.com/tonistiigi/fifo
 
-  nakedret:
-    # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
-    max-func-lines: 0
-
   nolintlint:
     # Enable to ensure that nolint directives are all used. Default is true.
     allow-unused: false
