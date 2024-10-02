@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License 2.0;
 // you may not use this file except in compliance with the Elastic License 2.0.
 
-//go:build integration
+//go:build !integration
 
 package integration
 
@@ -116,8 +116,6 @@ func startMockES(t *testing.T) string {
 	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Elastic-Product", "Elasticsearch")
 		w.Header().Set(http.CanonicalHeaderKey("Content-Type"), "application/json")
-		t.Log(r.URL.Path)
-		t.Log(r.Header.Get("Content-Encoding"))
 		switch {
 		case r.Method == http.MethodGet && r.URL.Path == "/":
 			root := fmt.Sprintf("{\"name\" : \"mock\", \"cluster_uuid\" : \"%s\", \"version\" : { \"number\" : \"0.0.0\", \"build_flavor\" : \"default\"}}", clusterUUID)
@@ -139,8 +137,9 @@ func startMockES(t *testing.T) string {
 			first := true
 			scanner := bufio.NewScanner(body)
 			for scanner.Scan() {
-				// Action is always "create", skip decoding to avoid
-				// inflating allocations in benchmark.
+				if len(scanner.Bytes()) == 0 {
+					continue
+				}
 				if !scanner.Scan() {
 					panic("expected source")
 				}
